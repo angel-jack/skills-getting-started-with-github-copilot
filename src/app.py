@@ -1,8 +1,13 @@
 """
 High School Management System API
 
-A super simple FastAPI application that allows students to view and sign up
-for extracurricular activities at Mergington High School.
+A super simple FastAPI application that allows students to view, sign up,
+and unregister for extracurricular activities at Mergington High School.
+
+Endpoints:
+- GET /activities: List all activities and their details.
+- POST /activities/{activity_name}/signup: Sign up a student for an activity.
+- POST /activities/{activity_name}/unregister: Unregister a student from an activity.
 """
 
 from fastapi import FastAPI, HTTPException
@@ -100,19 +105,58 @@ def root():
 
 @app.get("/activities")
 def get_activities():
+    """Get all activities and their details."""
     return activities
 
 
 @app.post("/activities/{activity_name}/signup")
 def signup_for_activity(activity_name: str, email: str):
-    """Sign up a student for an activity"""
-    # Validate activity exists
+    """
+    Sign up a student for an activity.
+
+    Args:
+        activity_name (str): The name of the activity.
+        email (str): The student's email address.
+
+    Returns:
+        dict: Success message.
+
+    Raises:
+        HTTPException: If activity not found, already signed up, or full.
+    """
     if activity_name not in activities:
         raise HTTPException(status_code=404, detail="Activity not found")
-
-    # Get the specific activity
     activity = activities[activity_name]
-    # Validate student is not already signed up
-    # Add student
+    # Prevent duplicate signups
+    if email in activity["participants"]:
+        raise HTTPException(status_code=400, detail="Student already signed up for this activity")
+    # Prevent exceeding max participants
+    if len(activity["participants"]) >= activity["max_participants"]:
+        raise HTTPException(status_code=400, detail="Activity is full")
     activity["participants"].append(email)
     return {"message": f"Signed up {email} for {activity_name}"}
+
+
+@app.post("/activities/{activity_name}/unregister")
+def unregister_from_activity(activity_name: str, email: str):
+    """
+    Unregister a student from an activity.
+
+    Args:
+        activity_name (str): The name of the activity.
+        email (str): The student's email address.
+
+    Returns:
+        dict: Success message.
+
+    Raises:
+        HTTPException: If activity not found or student not registered.
+    """
+    if activity_name not in activities:
+        raise HTTPException(status_code=404, detail="Activity not found")
+    activity = activities[activity_name]
+    # Check if student is registered
+    if email not in activity["participants"]:
+        raise HTTPException(status_code=404, detail="Student not registered for this activity")
+    activity["participants"].remove(email)
+    return {"message": f"Unregistered {email} from {activity_name}"}

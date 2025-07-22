@@ -12,5 +12,46 @@ Remember, it's self-paced so feel free to take a break! ☕️
 
 ---
 
+# Mergington High School Activities API
+
+A FastAPI application for managing extracurricular activities at Mergington High School.
+
+## Features
+
+- View all available activities and their details
+- Sign up for an activity (with participant limits)
+- Unregister from an activity
+
+## API Endpoints
+
+- `GET /activities`  
+  Returns all activities and their details.
+
+- `POST /activities/{activity_name}/signup?email=student@mergington.edu`  
+  Sign up a student for an activity.
+
+- `POST /activities/{activity_name}/unregister?email=student@mergington.edu`  
+  Unregister a student from an activity.
+
+## Running Locally
+
+```bash
+pip install fastapi uvicorn
+uvicorn src.app:app --reload
+```
+
+## Running Tests
+
+```bash
+pip install pytest httpx
+pytest
+```
+
+## Frontend
+
+Open `src/static/index.html` in your browser for a simple UI.
+
+---
+
 &copy; 2025 GitHub &bull; [Code of Conduct](https://www.contributor-covenant.org/version/2/1/code_of_conduct/code_of_conduct.md) &bull; [MIT License](https://gh.io/mit)
 
